@@ -12,7 +12,7 @@ type ForEachData = any[] | Record<any, any>
  */
 type ForEachCallback<D extends ForEachData, T, K = ForEachKey<D>> = (
   this: Nullish<T, D>,
-  current: [key: K, value: D[K]],
+  current: { key: K; value: D[K] },
   data: D
 ) => void | symbol | D[K]
 
@@ -43,7 +43,7 @@ function each<D extends ForEachData, T = D, K = ForEachKey<D>>(
 
   if (Array.isArray(data)) {
     for (let i = 0; i < data.length; i++) {
-      const result = callback.call(ThisArg, [i as unknown as K, data[i]], data)
+      const result = callback.call(ThisArg, { key: i as unknown as K, value: data[i] }, data)
       switch (result) {
         case undefined:
           break
@@ -63,7 +63,7 @@ function each<D extends ForEachData, T = D, K = ForEachKey<D>>(
   } else {
     for (let key in data) {
       if (data.hasOwnProperty(key)) {
-        const result = callback.call(ThisArg, [key as unknown as K, data[key] as unknown as D[K]], data)
+        const result = callback.call(ThisArg, { key: key as unknown as K, value: data[key] as unknown as D[K] }, data)
         switch (result) {
           case undefined:
             break
