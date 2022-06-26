@@ -85,3 +85,61 @@ function each<D extends ForEachData, T = D, K = ForEachKey<D>>(
 }
 
 export const forEach = Object.assign(each, ForEach)
+
+/**
+ * 可控的数组/对象遍历（从右到左/从后往前）
+ * @param data 被遍历的数组或对象
+ * @param callback 遍历中每个元素执行的函数，该函数接收一至两个个参数。
+ * @param thisArg 当执行回调函数 callback 时，用作 this 的值
+ */
+function eachRight<D extends ForEachData, T = D, K = ForEachKey<D>>(
+  data: D,
+  callback: ForEachCallback<D, T, K>,
+  thisArg?: T
+) {
+  const ThisArg = (thisArg ?? data) as Nullish<T, D>
+
+  if (Array.isArray(data)) {
+    for (let i = data.length - 1; i > -1; i--) {
+      const result = callback.call(ThisArg, { key: i as unknown as K, value: data[i] }, data)
+      switch (result) {
+        case undefined:
+          break
+        case ForEach.DELETE:
+          data.splice(i, 1)
+          break
+        case ForEach.BREAK:
+          return
+        case ForEach.DELETE_BREAK:
+          data.splice(i, 1)
+          return
+        default:
+          data.splice(i, 1, result)
+          break
+      }
+    }
+  } else {
+    const keys = Object.keys(data)
+    for (let i = keys.length - 1; i > -1; i--) {
+      const key = keys[i]
+      const result = callback.call(ThisArg, { key: key as unknown as K, value: data[key] as unknown as D[K] }, data)
+      switch (result) {
+        case undefined:
+          break
+        case ForEach.DELETE:
+          Reflect.deleteProperty(data, key)
+          break
+        case ForEach.BREAK:
+          return
+        case ForEach.DELETE_BREAK:
+          Reflect.deleteProperty(data, key)
+          return
+        default:
+          Reflect.set(data, key, result)
+          break
+      }
+    }
+  }
+}
+
+export const forEachRight = Object.assign(eachRight, ForEach)
