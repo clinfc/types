@@ -13,6 +13,17 @@ type DataMappingBackward<T extends DataMappingOpts, D, M> = {
 /**
  * 数据映射，将一个字段名映射成另一个字段名，支持正向映射和逆向映射
  * @param opts 字段映射对象
+ * @example
+ *  const { forward, backward } = useDataMapping({
+ *    name: 'cname',
+ *    age: 'cage'
+ *  } as const)
+ *
+ *  // { cname: '李白', cage: 24 }
+ *  const data1 = forward({ name: '李白', age: 24, sex: 1 }, false)
+ *
+ *  // { name: '李白', age: 24, sex: 1 }
+ *  const data2 = backward({ cname: '李白', cage: 24, sex: 1 }, true)
  */
 export function useDataMapping<T extends DataMappingOpts>(opts: T) {
   const mapping = Object.entries(opts) as DataMappingEntries<T>
