@@ -25,16 +25,20 @@ export function useDataMapping<T extends DataMappingOpts>(opts: T) {
   function forward<D extends object, M extends boolean = true>(data: D, merge: M = true as M) {
     const temp = {} as DataMappingForward<T, D, M>
 
-    const set = new Set(Object.keys(data)) as Set<PropertyKey>
-
-    mapping.forEach(([k, nk]) => {
-      set.delete(k)
-      Reflect.set(temp, nk, Reflect.get(data, k))
-    })
-
     if (merge) {
+      const set = new Set(Object.keys(data)) as Set<PropertyKey>
+
+      mapping.forEach(([k, nk]) => {
+        set.delete(k)
+        Reflect.set(temp, nk, Reflect.get(data, k))
+      })
+
       set.forEach((k) => {
         Reflect.set(temp, k, Reflect.get(data, k))
+      })
+    } else {
+      mapping.forEach(([k, nk]) => {
+        Reflect.set(temp, nk, Reflect.get(data, k))
       })
     }
 
@@ -49,16 +53,20 @@ export function useDataMapping<T extends DataMappingOpts>(opts: T) {
   function backward<D extends object, M extends boolean = true>(data: D, merge: M = true as M) {
     const temp = {} as DataMappingBackward<T, D, M>
 
-    const set = new Set(Object.keys(data)) as Set<PropertyKey>
-
-    mapping.forEach(([nk, k]) => {
-      set.delete(k)
-      Reflect.set(temp, nk, Reflect.get(data, k))
-    })
-
     if (merge) {
+      const set = new Set(Object.keys(data)) as Set<PropertyKey>
+
+      mapping.forEach(([nk, k]) => {
+        set.delete(k)
+        Reflect.set(temp, nk, Reflect.get(data, k))
+      })
+
       set.forEach((k) => {
         Reflect.set(temp, k, Reflect.get(data, k))
+      })
+    } else {
+      mapping.forEach(([nk, k]) => {
+        Reflect.set(temp, nk, Reflect.get(data, k))
       })
     }
 
