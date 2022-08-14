@@ -82,20 +82,6 @@ function serialize<T>(data: T): T {
 }
 
 /**
- * 将请求参数转为字符串
- * @param config 单一请求的请求参数
- */
-function singleRequestKey(config: AxiosRequestConfig) {
-  const { url, method, params, data } = config
-  return JSON.stringify({
-    method,
-    url: url?.replace(/\/$/, ''),
-    params: typeof params === 'object' ? JSON.stringify(params) : params,
-    data: typeof data === 'object' ? JSON.stringify(data) : data,
-  })
-}
-
-/**
  * 单一请求
  * @param config 请求参数
  */
@@ -103,7 +89,7 @@ export default function singleRequest<T>(config: AxiosRequestConfig) {
   return new Promise((resolve, reject) => {
     config = serialize(config)
 
-    const key = singleRequestKey(config)
+    const key = JSON.stringify(config)
 
     if (resolveResponse(key, resolve)) return
 
